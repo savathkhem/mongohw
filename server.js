@@ -27,9 +27,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/week18Populater");
+mongoose.connect("mongodb://localhost/mongoScraper");
 
 // Routes
+
 
 // A GET route for scraping the echoJS website
 app.get("/scrape", function(req, res) {
@@ -109,6 +110,19 @@ app.post("/articles/:id", function(req, res) {
       return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
     })
     .then(function(dbArticle) {
+      // If we were able to successfully update an Article, send it back to the client
+      res.json(dbArticle);
+    })
+    .catch(function(err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
+});
+
+// Route for setting favorite
+app.post("/favorite/:id", function(req, res) {
+      return db.Article.findOneAndUpdate({ _id: req.params.id }, { favorite: true })
+      .then(function(dbArticle) {
       // If we were able to successfully update an Article, send it back to the client
       res.json(dbArticle);
     })
