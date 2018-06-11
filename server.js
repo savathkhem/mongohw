@@ -27,7 +27,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/mongoScraper");
+// mongoose.connect("mongodb://localhost/mongoScraper");
+
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI);
+
 
 // Routes
 
@@ -120,7 +129,7 @@ app.post("/articles/:id", function(req, res) {
 });
 
 // Route for setting favorite
-app.post("/favorite/:id", function(req, res) {
+app.put("/favorite/:id", function(req, res) {
       return db.Article.findOneAndUpdate({ _id: req.params.id }, { favorite: true })
       .then(function(dbArticle) {
       // If we were able to successfully update an Article, send it back to the client

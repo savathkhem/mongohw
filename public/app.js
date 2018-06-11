@@ -35,6 +35,55 @@ $(document).ready(function () {
     $("#notes").empty();
   };
 
+  // RENDER ARTICLES
+  function renderArticles(data) {
+    for (var i = 0; i < data.length; i++) {
+      // Display the apropos information on the page
+      $("#articles").append(`
+  <div class="card">
+    <h5 data-id=${data[i]._id} class="card-header">${data[i].title}</h5>
+      <div class="card-body">
+        <a href="${data[i].link}" class="btn btn-primary" target="_blank">Link</a>
+        <a class="btn btn-warning" id="favorites" data-id="${data[i]._id}">Favorite</a>
+        <a class="btn btn-danger" data-toggle="modal" data-target="#modalNotes${data[i]._id}">Notes</a>
+      </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="modalNotes${data[i]._id}" tabindex="-1" role="dialog" aria-labelledby="modalNotesTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="modalNotesTitle${data[i]._id}">${data[i].title}</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+
+              <div class="modal-body">
+                <form>
+                  <div class="form-group">
+                    <label for="Title">Title</label>
+                    <input class="form-control" id='titleinput' name='title' placeholder="Type a Title for this note">
+                  </div>
+                  <div class="form-group">
+                    <label for="body">Body</label>
+                    <textarea class="form-control" id="bodyinput" name='body' placeholder="Type some notes you would like to save" rows="3"></textarea>
+                  </div>
+                </form>
+              </div>
+
+              <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-id=${data[i]._id} id='savenote'>Save</button>
+              </div>
+
+          </div>
+      </div>
+  </div>
+  `);
+    }
+  };
+
 
   // When you click the savenote button
   $(document).on("click", "#savenote", function () {
@@ -78,25 +127,21 @@ $(document).ready(function () {
     })
   });
 
-  $("#favorite").on("click", function () {
+  $(".favorite").on("click", function () {
     console.log('click')
     var thisId = $(this).attr("data-id");
     $.ajax({
-      method: "POST",
+      method: "PUT",
       url: "/favorite/" + thisId,
       data: {
-        // Value taken from title input
         favorite: true,
       }
     })
   });
 
-
   // WHEN USER CLICKS THE ARTICLES BUTTON, WE POPULATE ARTICLES TO PAGE
-  $("#showarticles").on("click", function () {
-    $("#main").empty();
-    $("#articles").empty();
-    $("#notes").empty();
+  $('#showarticles').on('click', function () {
+    renderEmpty();
     // Grab the articles as a json
     $.getJSON("/articles", function (data) {
       console.log(data);
@@ -110,51 +155,7 @@ $(document).ready(function () {
             </div>
         </div>
     `)
-      for (var i = 0; i < data.length; i++) {
-        // Display the apropos information on the page
-        $("#articles").append(`
-      <div class="card">
-        <h5 data-id=${data[i]._id} class="card-header">${data[i].title}</h5>
-          <div class="card-body">
-            <a href="${data[i].link}" class="btn btn-primary">Link</a>
-            <a class="btn btn-warning data-id=${data[i]._id} id="favorite">Favorite</a>
-            <a class="btn btn-danger" data-toggle="modal" data-target="#modalNotes${data[i]._id}">Notes</a>
-          </div>
-      </div>
-
-      <!-- Modal -->
-      <div class="modal fade" id="modalNotes${data[i]._id}" tabindex="-1" role="dialog" aria-labelledby="modalNotesTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h5 class="modal-title" id="modalNotesTitle${data[i]._id}">${data[i].title}</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                      </button>
-                  </div>
-
-                  <div class="modal-body">
-                    <form>
-                      <div class="form-group">
-                        <label for="Title">Title</label>
-                        <input class="form-control" id='titleinput' name='title' placeholder="Type a Title for this note">
-                      </div>
-                      <div class="form-group">
-                        <label for="body">Body</label>
-                        <textarea class="form-control" id="bodyinput" name='body' placeholder="Type some notes you would like to save" rows="3"></textarea>
-                      </div>
-                    </form>
-                  </div>
-
-                  <div class="modal-footer">
-                  <button type="button" class="btn btn-danger" data-id=${data[i]._id} id='savenote'>Save</button>
-                  </div>
-
-              </div>
-          </div>
-      </div>
-      `);
-      }
+      renderArticles(data);
     });
   });
 
