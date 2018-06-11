@@ -44,7 +44,7 @@ $(document).ready(function () {
     <h5 data-id=${data[i]._id} class="card-header">${data[i].title}</h5>
       <div class="card-body">
         <a href="${data[i].link}" class="btn btn-primary" target="_blank">Link</a>
-        <a class="btn btn-warning" id="favorites" data-id="${data[i]._id}">Favorite</a>
+        <!-- <a class="btn btn-warning" id="favorites" data-id="${data[i]._id}">Favorite</a> -->
         <a class="btn btn-danger" data-toggle="modal" data-target="#modalNotes${data[i]._id}">Notes</a>
       </div>
   </div>
